@@ -1,4 +1,4 @@
-import type { Attempt, AttemptResult, Exam, Subject } from '@/types/exam';
+import type { Attempt, AttemptResult, Exam, Subject, TakeExam } from '@/types/exam';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001/api';
 
@@ -95,24 +95,20 @@ export const authStorage = {
 };
 
 export const apiClient = {
-  login: (email: string, password: string) =>
-    request<AuthResponse>('/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) }),
-  register: (name: string, email: string, password: string) =>
-    request<AuthResponse>('/auth/register', { method: 'POST', body: JSON.stringify({ name, email, password }) }),
+  login: (email: string, password: string) => request<AuthResponse>('/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) }),
+  register: (name: string, email: string, password: string) => request<AuthResponse>('/auth/register', { method: 'POST', body: JSON.stringify({ name, email, password }) }),
   me: () => request<AuthUser>('/auth/me', undefined, true),
 
   subjects: () => request<Subject[]>('/subjects'),
   adminSubjects: () => request<Array<Subject & { status: 'active' | 'inactive'; order: number }>>('/subjects/admin/all', undefined, true),
-  createSubject: (payload: Omit<Subject, '_id'> & { status?: 'active' | 'inactive'; order?: number }) =>
-    request<Subject>('/subjects', { method: 'POST', body: JSON.stringify(payload) }, true),
+  createSubject: (payload: Omit<Subject, '_id'> & { status?: 'active' | 'inactive'; order?: number }) => request<Subject>('/subjects', { method: 'POST', body: JSON.stringify(payload) }, true),
 
-  questions: (subjectId?: string) =>
-    request<AdminQuestion[]>(subjectId ? `/questions?subjectId=${subjectId}` : '/questions'),
-  createQuestion: (payload: QuestionPayload) =>
-    request<AdminQuestion>('/questions', { method: 'POST', body: JSON.stringify(payload) }, true),
+  questions: (subjectId?: string) => request<AdminQuestion[]>(subjectId ? `/questions?subjectId=${subjectId}` : '/questions'),
+  createQuestion: (payload: QuestionPayload) => request<AdminQuestion>('/questions', { method: 'POST', body: JSON.stringify(payload) }, true),
 
   exams: (subjectId?: string) => request<Exam[]>(subjectId ? `/exams?subjectId=${subjectId}` : '/exams'),
   exam: (id: string) => request<Exam>(`/exams/${id}`),
+  takeExam: (id: string) => request<TakeExam>(`/exams/${id}/take`),
   adminExams: () => request<AdminExam[]>('/exams/admin/all', undefined, true),
   adminExam: (id: string) => request<AdminExam>(`/exams/admin/${id}`, undefined, true),
   createExam: (payload: ExamPayload) => request<AdminExam>('/exams', { method: 'POST', body: JSON.stringify(payload) }, true),
