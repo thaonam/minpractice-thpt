@@ -5,16 +5,11 @@ export function AppHeader() {
     <header className="topbar">
       <Link className="brand" href="/">
         <span className="mark">MP</span>
-        <span>
-          <strong>MinPractice THPT</strong>
-          <br />
-          <span className="muted">Luyen de theo workflow that</span>
-        </span>
+        <span><strong>MinPractice THPT</strong><br /><span className="muted">Luyen de theo workflow that</span></span>
       </Link>
-      <nav>
-        <Link className="btn secondary" href="/admin">
-          Admin
-        </Link>
+      <nav className="nav-actions">
+        <Link className="btn secondary" href="/login">Dang nhap</Link>
+        <Link className="btn secondary" href="/admin">Admin</Link>
       </nav>
     </header>
   );
