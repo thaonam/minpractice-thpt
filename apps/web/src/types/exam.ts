@@ -39,12 +39,21 @@ export interface TakeExam extends Exam {
   sections: TakeSection[];
 }
 
+export interface AttemptAnswer {
+  questionId: string;
+  answer?: string;
+  answeredAt?: string;
+}
+
 export interface Attempt {
   _id: string;
+  userId?: string;
   examId: string;
   status: 'in_progress' | 'submitted' | 'expired';
   startedAt: string;
+  submittedAt?: string;
   expiresAt: string;
+  answers?: AttemptAnswer[];
   score?: number;
   correctCount: number;
   wrongCount: number;
