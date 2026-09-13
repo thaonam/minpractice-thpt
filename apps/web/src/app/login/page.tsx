@@ -1,12 +1,13 @@
 'use client';
 
 import { FormEvent, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { AppHeader } from '@/components/app-header';
 import { apiClient, authStorage } from '@/lib/api-client';
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -19,7 +20,8 @@ export default function LoginPage() {
     try {
       const response = await apiClient.login(email, password);
       authStorage.save(response);
-      router.push(response.user.role === 'student' ? '/' : '/admin');
+      const next = searchParams.get('next');
+      router.push(next || (response.user.role === 'student' ? '/' : '/admin'));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Dang nhap that bai');
     } finally {
@@ -35,18 +37,10 @@ export default function LoginPage() {
         <h1>Dang nhap</h1>
         <p className="muted">Dang nhap de quan ly noi dung hoac luu lich su luyen de.</p>
         <form className="form-stack" onSubmit={submit}>
-          <label>
-            Email
-            <input className="input" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-          </label>
-          <label>
-            Mat khau
-            <input className="input" type="password" value={password} onChange={(e) => setPassword(e.target.value)} minLength={8} required />
-          </label>
+          <label>Email<input className="input" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required /></label>
+          <label>Mat khau<input className="input" type="password" value={password} onChange={(e) => setPassword(e.target.value)} minLength={8} required /></label>
           {error ? <p className="error-text">{error}</p> : null}
-          <button className="btn" type="submit" disabled={loading}>
-            {loading ? 'Dang xu ly...' : 'Dang nhap'}
-          </button>
+          <button className="btn" type="submit" disabled={loading}>{loading ? 'Dang xu ly...' : 'Dang nhap'}</button>
         </form>
       </section>
     </main>
