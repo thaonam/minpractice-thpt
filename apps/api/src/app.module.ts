@@ -5,6 +5,7 @@ import { AdminModule } from './modules/admin/admin.module';
 import { AttemptsModule } from './modules/attempts/attempts.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { ExamsModule } from './modules/exams/exams.module';
+import { QuestionsModule } from './modules/questions/questions.module';
 import { SubjectsModule } from './modules/subjects/subjects.module';
 import { UsersModule } from './modules/users/users.module';
 
@@ -20,6 +21,7 @@ import { UsersModule } from './modules/users/users.module';
     AuthModule,
     UsersModule,
     SubjectsModule,
+    QuestionsModule,
     ExamsModule,
     AttemptsModule,
     AdminModule,
