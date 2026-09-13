@@ -33,7 +33,6 @@ export class AttemptsService {
 
     const startedAt = new Date();
     const expiresAt = new Date(startedAt.getTime() + exam.durationMinutes * 60 * 1000);
-
     return this.attemptModel.create({
       userId: userObjectId,
       examId: new Types.ObjectId(examId),
@@ -62,6 +61,11 @@ export class AttemptsService {
       await this.gradeAndFinalize(attempt, true);
       throw new BadRequestException('Attempt is expired and has been submitted');
     }
+
+    const exam = await this.examModel.findById(attempt.examId).lean();
+    if (!exam) throw new NotFoundException('Exam not found');
+    const allowedQuestionIds = new Set(exam.sections.flatMap((section) => section.questionIds).map(String));
+    if (!allowedQuestionIds.has(dto.questionId)) throw new BadRequestException('Question does not belong to this exam');
 
     const questionId = new Types.ObjectId(dto.questionId);
     const existingAnswer = attempt.answers.find((item) => String(item.questionId) === dto.questionId);
@@ -96,13 +100,19 @@ export class AttemptsService {
   }
 
   private async gradeAndFinalize(attempt: any, expired: boolean) {
+    const existingResult = await this.attemptResultModel.findOne({ attemptId: attempt._id }).lean();
+    if (existingResult) return attempt;
+
     const exam = await this.examModel.findById(attempt.examId).lean();
     if (!exam) throw new NotFoundException('Exam not found');
 
     const questionIds = exam.sections.flatMap((section) => section.questionIds);
     const questions = await this.questionModel.find({ _id: { $in: questionIds } }).lean();
-    const result = this.gradingService.grade(questions, attempt.answers);
+    const questionById = new Map(questions.map((question) => [String(question._id), question]));
+    const orderedQuestions = questionIds.map((questionId) => questionById.get(String(questionId))).filter(Boolean) as any[];
+    if (orderedQuestions.length !== questionIds.length) throw new BadRequestException('Exam contains missing questions');
 
+    const result = this.gradingService.grade(orderedQuestions, attempt.answers, exam.totalScore);
     attempt.status = expired ? 'expired' : 'submitted';
     attempt.submittedAt = new Date();
     attempt.score = result.score;
@@ -114,12 +124,12 @@ export class AttemptsService {
     await this.attemptResultModel.updateOne(
       { attemptId: attempt._id },
       {
-        $set: {
+        $setOnInsert: {
           attemptId: attempt._id,
           userId: attempt.userId,
           examId: attempt.examId,
           score: result.score,
-          totalQuestions: questions.length,
+          totalQuestions: orderedQuestions.length,
           correctCount: result.correctCount,
           wrongCount: result.wrongCount,
           blankCount: result.blankCount,

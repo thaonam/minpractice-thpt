@@ -4,9 +4,27 @@ import { HydratedDocument, Types } from 'mongoose';
 export type AttemptResultDocument = HydratedDocument<AttemptResult>;
 
 @Schema({ _id: false })
+export class AttemptResultOption {
+  @Prop({ required: true })
+  key!: string;
+
+  @Prop({ required: true })
+  content!: string;
+}
+
+@Schema({ _id: false })
 export class AttemptResultDetail {
   @Prop({ type: Types.ObjectId, ref: 'Question', required: true })
   questionId!: Types.ObjectId;
+
+  @Prop()
+  type?: string;
+
+  @Prop()
+  content?: string;
+
+  @Prop({ type: [AttemptResultOption], default: [] })
+  options!: AttemptResultOption[];
 
   @Prop()
   userAnswer?: string;
@@ -19,9 +37,6 @@ export class AttemptResultDetail {
 
   @Prop()
   explanation?: string;
-
-  @Prop()
-  content?: string;
 }
 
 @Schema({ timestamps: true })

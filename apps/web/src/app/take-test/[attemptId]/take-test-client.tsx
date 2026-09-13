@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { CountdownTimer } from '@/components/countdown-timer';
 import { QuestionRenderer } from '@/components/question-renderer';
@@ -13,29 +13,64 @@ export function TakeTestClient({ attempt, exam }: { attempt: Attempt; exam: Take
   const [answers, setAnswers] = useState<Record<string, string>>(initialAnswers);
   const [saveState, setSaveState] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const [submitting, setSubmitting] = useState(false);
+  const timers = useRef(new Map<string, number>());
+  const pendingAnswers = useRef(new Map<string, string>());
   const questions = useMemo(() => exam.sections.flatMap((section) => section.questions), [exam.sections]);
 
-  async function changeAnswer(questionId: string, answer: string) {
-    setAnswers((current) => ({ ...current, [questionId]: answer }));
+  useEffect(() => () => {
+    timers.current.forEach((timer) => window.clearTimeout(timer));
+  }, []);
+
+  const persistAnswer = useCallback(async (questionId: string, answer: string) => {
     setSaveState('saving');
-    try {
-      await apiClient.saveAnswer(attempt._id, questionId, answer);
-      setSaveState('saved');
-    } catch {
-      setSaveState('error');
+    let lastError: unknown;
+    for (let attemptNo = 0; attemptNo < 3; attemptNo += 1) {
+      try {
+        await apiClient.saveAnswer(attempt._id, questionId, answer);
+        pendingAnswers.current.delete(questionId);
+        setSaveState('saved');
+        return;
+      } catch (error) {
+        lastError = error;
+        if (attemptNo < 2) await new Promise((resolve) => window.setTimeout(resolve, 400 * (attemptNo + 1)));
+      }
     }
+    setSaveState('error');
+    throw lastError;
+  }, [attempt._id]);
+
+  function changeAnswer(questionId: string, answer: string) {
+    setAnswers((current) => ({ ...current, [questionId]: answer }));
+    pendingAnswers.current.set(questionId, answer);
+    const existingTimer = timers.current.get(questionId);
+    if (existingTimer) window.clearTimeout(existingTimer);
+    const timer = window.setTimeout(() => {
+      timers.current.delete(questionId);
+      void persistAnswer(questionId, answer).catch(() => undefined);
+    }, 350);
+    timers.current.set(questionId, timer);
   }
+
+  const flushPendingAnswers = useCallback(async () => {
+    timers.current.forEach((timer) => window.clearTimeout(timer));
+    timers.current.clear();
+    const pending = Array.from(pendingAnswers.current.entries());
+    if (!pending.length) return;
+    await Promise.all(pending.map(([questionId, answer]) => persistAnswer(questionId, answer)));
+  }, [persistAnswer]);
 
   const submit = useCallback(async () => {
     if (submitting) return;
     setSubmitting(true);
     try {
+      await flushPendingAnswers();
       await apiClient.submitAttempt(attempt._id);
       router.replace(`/results/${attempt._id}`);
-    } finally {
+    } catch {
+      setSaveState('error');
       setSubmitting(false);
     }
-  }, [attempt._id, router, submitting]);
+  }, [attempt._id, flushPendingAnswers, router, submitting]);
 
   return (
     <div className="test-layout">
@@ -48,15 +83,7 @@ export function TakeTestClient({ attempt, exam }: { attempt: Attempt; exam: Take
             </div>
             {section.questions.map((question) => {
               const index = questions.findIndex((item) => item._id === question._id);
-              return (
-                <QuestionRenderer
-                  index={index}
-                  key={question._id}
-                  onChange={(questionId, answer) => void changeAnswer(questionId, answer)}
-                  question={question}
-                  value={answers[question._id]}
-                />
-              );
+              return <QuestionRenderer index={index} key={question._id} onChange={changeAnswer} question={question} value={answers[question._id]} />;
             })}
           </div>
         ))}
@@ -70,7 +97,7 @@ export function TakeTestClient({ attempt, exam }: { attempt: Attempt; exam: Take
         <CountdownTimer expiresAt={attempt.expiresAt} onExpire={() => void submit()} />
         <p className="muted" style={{ marginTop: 16 }}>Da lam {Object.keys(answers).length}/{questions.length} cau</p>
         <p className={saveState === 'error' ? 'error-text' : 'muted'}>
-          {saveState === 'saving' ? 'Dang luu...' : saveState === 'saved' ? 'Da luu' : saveState === 'error' ? 'Luu that bai' : 'Autosave san sang'}
+          {saveState === 'saving' ? 'Dang luu...' : saveState === 'saved' ? 'Da luu' : saveState === 'error' ? 'Luu that bai - vui long thu lai truoc khi nop' : 'Autosave san sang'}
         </p>
         <div className="question-nav">
           {questions.map((question, index) => <span className={answers[question._id] ? 'question-dot answered' : 'question-dot'} key={question._id}>{index + 1}</span>)}
