@@ -8,6 +8,7 @@ export function AppHeader() {
         <span><strong>MinPractice THPT</strong><br /><span className="muted">Luyen de theo workflow that</span></span>
       </Link>
       <nav className="nav-actions">
+        <Link className="btn secondary" href="/history">Lich su</Link>
         <Link className="btn secondary" href="/login">Dang nhap</Link>
         <Link className="btn secondary" href="/admin">Admin</Link>
       </nav>
