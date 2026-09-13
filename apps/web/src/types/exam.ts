@@ -15,6 +15,30 @@ export interface Exam {
   status: 'draft' | 'published' | 'archived';
 }
 
+export interface QuestionOption {
+  key: string;
+  content: string;
+}
+
+export interface TakeQuestion {
+  _id: string;
+  type: 'single_choice' | 'true_false' | 'short_answer';
+  content: string;
+  options: QuestionOption[];
+  difficulty: 'easy' | 'medium' | 'hard';
+  tags: string[];
+}
+
+export interface TakeSection {
+  title: string;
+  description?: string;
+  questions: TakeQuestion[];
+}
+
+export interface TakeExam extends Exam {
+  sections: TakeSection[];
+}
+
 export interface Attempt {
   _id: string;
   examId: string;
@@ -25,4 +49,25 @@ export interface Attempt {
   correctCount: number;
   wrongCount: number;
   blankCount: number;
+}
+
+export interface AttemptResultDetail {
+  questionId: string;
+  content?: string;
+  userAnswer?: string;
+  correctAnswer: string;
+  isCorrect: boolean;
+  explanation?: string;
+}
+
+export interface AttemptResult {
+  _id: string;
+  attemptId: string;
+  examId: string;
+  score: number;
+  totalQuestions: number;
+  correctCount: number;
+  wrongCount: number;
+  blankCount: number;
+  details: AttemptResultDetail[];
 }
