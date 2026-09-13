@@ -29,6 +29,29 @@ export interface AdminQuestion extends QuestionPayload {
   _id: string;
 }
 
+export interface ExamSectionPayload {
+  title: string;
+  description?: string;
+  questionIds: string[];
+}
+
+export interface ExamPayload {
+  subjectId: string;
+  title: string;
+  examType?: string;
+  grade: string;
+  durationMinutes: number;
+  totalScore: number;
+  status?: 'draft' | 'published' | 'archived';
+  sections: ExamSectionPayload[];
+}
+
+export interface AdminExam extends ExamPayload {
+  _id: string;
+  status: 'draft' | 'published' | 'archived';
+  publishedAt?: string;
+}
+
 function getToken() {
   if (typeof window === 'undefined') return undefined;
   return window.localStorage.getItem('minpractice_access_token') ?? undefined;
@@ -90,6 +113,14 @@ export const apiClient = {
 
   exams: (subjectId?: string) => request<Exam[]>(subjectId ? `/exams?subjectId=${subjectId}` : '/exams'),
   exam: (id: string) => request<Exam>(`/exams/${id}`),
+  adminExams: () => request<AdminExam[]>('/exams/admin/all', undefined, true),
+  adminExam: (id: string) => request<AdminExam>(`/exams/admin/${id}`, undefined, true),
+  createExam: (payload: ExamPayload) =>
+    request<AdminExam>('/exams', { method: 'POST', body: JSON.stringify(payload) }, true),
+  updateExam: (id: string, payload: ExamPayload) =>
+    request<AdminExam>(`/exams/${id}`, { method: 'PATCH', body: JSON.stringify(payload) }, true),
+  publishExam: (id: string) => request<AdminExam>(`/exams/${id}/publish`, { method: 'POST' }, true),
+
   startAttempt: (examId: string) => request<Attempt>(`/exams/${examId}/attempts`, { method: 'POST' }),
   saveAnswer: (attemptId: string, questionId: string, answer?: string) =>
     request<Attempt>(`/attempts/${attemptId}/answers`, {
