@@ -4,7 +4,7 @@ import { AppHeader } from '@/components/app-header';
 const modules = [
   { name: 'Subjects', description: 'Quan ly mon hoc va khoi lop.', href: '/admin/subjects', ready: true },
   { name: 'Question Bank', description: 'Tao va loc ngan hang cau hoi.', href: '/admin/questions', ready: true },
-  { name: 'Exams', description: 'Exam Builder, section, preview va publish.', href: '#', ready: false },
+  { name: 'Exams', description: 'Exam Builder, section, preview va publish.', href: '/admin/exams', ready: true },
   { name: 'Users', description: 'Quan ly tai khoan va role.', href: '#', ready: false },
   { name: 'Analytics', description: 'Thong ke ket qua va luot thi.', href: '#', ready: false },
 ];
