@@ -1,4 +1,4 @@
-import type { Attempt, Exam, Subject } from '@/types/exam';
+import type { Attempt, AttemptResult, Exam, Subject } from '@/types/exam';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001/api';
 
@@ -115,17 +115,14 @@ export const apiClient = {
   exam: (id: string) => request<Exam>(`/exams/${id}`),
   adminExams: () => request<AdminExam[]>('/exams/admin/all', undefined, true),
   adminExam: (id: string) => request<AdminExam>(`/exams/admin/${id}`, undefined, true),
-  createExam: (payload: ExamPayload) =>
-    request<AdminExam>('/exams', { method: 'POST', body: JSON.stringify(payload) }, true),
-  updateExam: (id: string, payload: ExamPayload) =>
-    request<AdminExam>(`/exams/${id}`, { method: 'PATCH', body: JSON.stringify(payload) }, true),
+  createExam: (payload: ExamPayload) => request<AdminExam>('/exams', { method: 'POST', body: JSON.stringify(payload) }, true),
+  updateExam: (id: string, payload: ExamPayload) => request<AdminExam>(`/exams/${id}`, { method: 'PATCH', body: JSON.stringify(payload) }, true),
   publishExam: (id: string) => request<AdminExam>(`/exams/${id}/publish`, { method: 'POST' }, true),
 
-  startAttempt: (examId: string) => request<Attempt>(`/exams/${examId}/attempts`, { method: 'POST' }),
-  saveAnswer: (attemptId: string, questionId: string, answer?: string) =>
-    request<Attempt>(`/attempts/${attemptId}/answers`, {
-      method: 'PATCH',
-      body: JSON.stringify({ questionId, answer }),
-    }),
-  submitAttempt: (attemptId: string) => request<Attempt>(`/attempts/${attemptId}/submit`, { method: 'POST' }),
+  startAttempt: (examId: string) => request<Attempt>(`/exams/${examId}/attempts`, { method: 'POST' }, true),
+  attempt: (attemptId: string) => request<Attempt>(`/attempts/${attemptId}`, undefined, true),
+  attemptHistory: () => request<Attempt[]>('/attempts', undefined, true),
+  saveAnswer: (attemptId: string, questionId: string, answer?: string) => request<Attempt>(`/attempts/${attemptId}/answers`, { method: 'PATCH', body: JSON.stringify({ questionId, answer }) }, true),
+  submitAttempt: (attemptId: string) => request<Attempt>(`/attempts/${attemptId}/submit`, { method: 'POST' }, true),
+  attemptResult: (attemptId: string) => request<AttemptResult>(`/attempts/${attemptId}/result`, undefined, true),
 };
