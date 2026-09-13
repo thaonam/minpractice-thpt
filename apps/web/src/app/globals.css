@@ -7,85 +7,41 @@
   --primary: #0f3d5e;
   --primary-soft: #e4f0f8;
   --accent: #f5b841;
+  --danger: #b42318;
+  --success: #067647;
 }
-
-* {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  color: var(--ink);
-  background: linear-gradient(180deg, #eef6fb 0%, #ffffff 55%);
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-.shell {
-  width: min(1120px, calc(100% - 32px));
-  margin: 0 auto;
-  padding: 24px 0 48px;
-}
-
-.topbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 28px;
-}
-
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.mark {
-  display: grid;
-  width: 42px;
-  height: 42px;
-  place-items: center;
-  border-radius: 8px;
-  color: #fff;
-  background: var(--primary);
-  font-weight: 800;
-}
-
-.muted {
-  color: var(--muted);
-}
-
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 16px;
-}
-
-.card {
-  padding: 18px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: var(--panel);
-}
-
-.btn {
-  display: inline-flex;
-  min-height: 40px;
-  align-items: center;
-  justify-content: center;
-  border-radius: 8px;
-  padding: 0 14px;
-  color: #fff;
-  background: var(--primary);
-  font-weight: 700;
-}
-
-.btn.secondary {
-  color: var(--primary);
-  background: var(--primary-soft);
-}
+* { box-sizing: border-box; }
+body { margin: 0; color: var(--ink); background: linear-gradient(180deg, #eef6fb 0%, #ffffff 55%); font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+a { color: inherit; text-decoration: none; }
+button, input, select, textarea { font: inherit; }
+.shell { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 24px 0 48px; }
+.topbar, .section-row, .nav-actions { display: flex; align-items: center; }
+.topbar { justify-content: space-between; gap: 16px; margin-bottom: 28px; }
+.nav-actions, .section-row { gap: 10px; }
+.section-row { justify-content: space-between; }
+.brand { display: flex; align-items: center; gap: 12px; }
+.mark { display: grid; width: 42px; height: 42px; place-items: center; border-radius: 8px; color: #fff; background: var(--primary); font-weight: 800; }
+.muted { color: var(--muted); }
+.eyebrow { margin-bottom: 6px; color: var(--primary); font-size: 13px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+.card { padding: 18px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); }
+.btn { display: inline-flex; min-height: 40px; align-items: center; justify-content: center; border: 0; border-radius: 8px; padding: 0 14px; color: #fff; background: var(--primary); font-weight: 700; cursor: pointer; }
+.btn.secondary { color: var(--primary); background: var(--primary-soft); }
+.btn:disabled { opacity: .6; cursor: wait; }
+.auth-card { width: min(460px, 100%); margin: 60px auto; }
+.form-stack { display: grid; gap: 14px; }
+.form-stack label { display: grid; gap: 7px; font-weight: 650; }
+.input { width: 100%; min-height: 42px; border: 1px solid var(--line); border-radius: 8px; padding: 9px 11px; color: var(--ink); background: #fff; }
+.textarea { min-height: 110px; resize: vertical; }
+.compact { width: auto; min-width: 160px; }
+.error-text { color: var(--danger); }
+.admin-layout { display: grid; grid-template-columns: minmax(280px, 360px) 1fr; gap: 18px; align-items: start; }
+.table-wrap { overflow-x: auto; }
+.table { width: 100%; border-collapse: collapse; }
+.table th, .table td { padding: 11px 8px; border-bottom: 1px solid var(--line); text-align: left; }
+.badge { display: inline-flex; border-radius: 999px; padding: 5px 9px; color: var(--muted); background: var(--paper); font-size: 12px; font-weight: 800; }
+.badge.success { color: var(--success); background: #ecfdf3; }
+.question-list { display: grid; gap: 10px; }
+.question-item { padding: 12px 0; border-bottom: 1px solid var(--line); }
+.question-item p { margin-bottom: 0; }
+@media (max-width: 780px) { .admin-layout { grid-template-columns: 1fr; } .topbar { align-items: flex-start; } .nav-actions { flex-wrap: wrap; justify-content: flex-end; } }
