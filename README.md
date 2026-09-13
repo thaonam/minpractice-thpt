@@ -1,34 +1,43 @@
 # MinPractice THPT
 
-MinPractice THPT is a starter web app for high-school graduation exam practice. It includes a take-test flow, subject overview, answer navigation, timer, and result summary.
+MinPractice THPT is a multi-subject exam practice system for students preparing for Vietnamese high-school exams.
 
-## Tech stack
+The product direction is:
 
-- Vite
-- React
-- JavaScript
-- CSS
+- Frontend: Next.js
+- Backend: NestJS
+- Database: MongoDB
 
-## Local development
+## Current Scope
+
+- `apps/web`: Next.js frontend skeleton
+- `apps/api`: NestJS API skeleton
+- `ARCHITECTURE.md`: product architecture, workflows, API draft, and MongoDB schema
+- `DEPLOYMENT.md`: Vercel, API hosting, and MongoDB Atlas setup
+
+## Local Development
+
+Install dependencies from the project root:
 
 ```bash
 npm install
-npm run dev
 ```
 
-Then open the local URL shown by Vite.
+Run the frontend:
 
-## Current features
+```bash
+npm run dev:web
+```
 
-- Subject cards for Math, Literature, English, Physics, Chemistry, Biology, History, Geography, and Civic Education
-- Demo test workspace with timer, question list, answer panel, and progress tracking
-- Submit flow with score, correct/incorrect count, and answer review
-- Responsive layout for desktop and mobile
+Run the backend:
 
-## Suggested next steps
+```bash
+npm run dev:api
+```
 
-- Add real exam/question data model
-- Add authentication and student history
-- Add admin tools for exam import
-- Add backend API and database
-- Add detailed explanations for each answer
+The API expects:
+
+```bash
+MONGODB_URI=mongodb://localhost:27017/minpractice
+JWT_SECRET=change-me
+```
